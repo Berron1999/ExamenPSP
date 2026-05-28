@@ -1,0 +1,8 @@
+Vamos ha hacer un par de ejercicios mas , tengo este : 1. Desarrolla un
+sistema cliente servidor.a. El servidor deberá atender las peticiones del cliente.
+Las peticiones del cliente serán de 2 tipos:Listar ficheros y Mostrar fichero. La primera opción enviará
+al cliente el listado de ficherosexistentes en un directorio de trabajo definido en el servidor.
+La segunda enviará al cliente elcontenido de un fichero
+(el nombre del fichero formará parte de la solicitud del cliente),
+supondremos que todos los ficherosdisponibles serán de ficheros de texto. El servidor debe permitir la conexión de múltiples
+ clientes.

@@ -1,0 +1,22 @@
+Microsoft Windows [Versi¢n 10.0.26100.6899]
+(c) Microsoft Corporation. Todos los derechos reservados.
+
+C:\Users\dam2\Desktop\PSP-2025-2026\EjerciciosT1\EjerciciosT1>ping www.dam2chomon.org
+La solicitud de ping no pudo encontrar el host www.dam2chomon.org. Compruebe el nombre y
+vuelva a intentarlo.
+
+C:\Users\dam2\Desktop\PSP-2025-2026\EjerciciosT1\EjerciciosT1>ping www.google.es
+
+Haciendo ping a www.google.es [142.250.185.3] con 32 bytes de datos:
+Respuesta desde 142.250.185.3: bytes=32 tiempo=10ms TTL=114
+Respuesta desde 142.250.185.3: bytes=32 tiempo=10ms TTL=114
+Respuesta desde 142.250.185.3: bytes=32 tiempo=16ms TTL=114
+Respuesta desde 142.250.185.3: bytes=32 tiempo=10ms TTL=114
+
+Estad¡sticas de ping para 142.250.185.3:
+    Paquetes: enviados = 4, recibidos = 4, perdidos = 0
+    (0% perdidos),
+Tiempos aproximados de ida y vuelta en milisegundos:
+    M¡nimo = 10ms, M ximo = 16ms, Media = 11ms
+
+C:\Users\dam2\Desktop\PSP-2025-2026\EjerciciosT1\EjerciciosT1>¨M s? 
