@@ -1,0 +1,49 @@
+Ejercicio combinado (Temas 1, 2 y 4) – Transferencias bancarias seguras
+Un banco quiere procesar transferencias enviadas por varios clientes a la vez, pero solo dispone de capacidad para procesar 2 transferencias simultáneamente (el resto debe esperar su turno). Además, cada transferencia debe llevar un código HMAC para garantizar que los datos no han sido manipulados en el camino (en vez del hash simple que hemos usado en ejercicios anteriores). Se pide:
+1. Clase DatosTransferencia (implementa Serializable)
+
+Atributos: cuentaOrigen (String), cuentaDestino (String), importe (double) y hmacEnviado (String, calculado por el cliente sobre los tres datos anteriores concatenados).
+Constructor y getters.
+
+2. Clase RespuestaTransferencia (implementa Serializable)
+
+Atributos: mensaje (String) y hmacRespuesta (String, el HMAC del propio mensaje, calculado por el servidor).
+Constructor y getters.
+
+3. Clase UtilHMAC
+
+Una clave secreta fija compartida (un byte[] de 16 bytes, igual estilo que la clave AES de ejercicios anteriores).
+Método calcularHMAC(String texto) que use Mac.getInstance("HmacSHA256"), inicializado con la clave mediante un SecretKeySpec, y devuelva el resultado en hexadecimal.
+
+4. Clase ManejadorTransferencia (extiende Thread)
+
+Recibe por constructor el Socket del cliente y un Semaphore compartido (con 2 permisos).
+En su run():
+
+Pide permiso al semáforo antes de procesar (simulando que solo hay capacidad para 2 transferencias a la vez).
+Abre ObjectOutputStream antes que ObjectInputStream.
+Lee el DatosTransferencia, recalcula el HMAC sobre cuentaOrigen + cuentaDestino + importe y lo compara con hmacEnviado.
+Si coincide: simula el procesamiento con Thread.sleep(3000), construye el mensaje "Transferencia de <importe> de <origen> a <destino> procesada".
+Si no coincide: el mensaje es "Transferencia rechazada: integridad comprometida" (sin simular procesamiento ni dormir el hilo).
+Calcula el HMAC del mensaje de respuesta y lo envía dentro de un RespuestaTransferencia.
+Libera el semáforo (en un finally, para garantizar que se libera siempre) y cierra el socket.
+
+
+
+5. Clase ServidorBanco (clase principal con main)
+
+Crea un Semaphore con 2 permisos, compartido por todos los clientes.
+Escucha en el puerto 7400.
+En bucle infinito, acepta conexiones y lanza un ManejadorTransferencia por cada una.
+
+6. Clase ClienteBanco (clase principal con main)
+
+Pide por teclado cuenta origen, cuenta destino e importe.
+Calcula el hmacEnviado con UtilHMAC y construye el DatosTransferencia.
+Envía los datos y recibe la RespuestaTransferencia.
+Verifica el hmacRespuesta recalculando el HMAC del mensaje recibido, y muestra el mensaje solo si la verificación es correcta (si no, avisa de que la respuesta no es de confianza).
+
+Requisitos adicionales:
+
+Si lanzas 3 o más clientes a la vez, deberías ver que solo 2 procesan inmediatamente (con el retardo de 3 segundos) y el resto espera hasta que se libere el semáforo.
+El release() del semáforo debe ir en un finally.

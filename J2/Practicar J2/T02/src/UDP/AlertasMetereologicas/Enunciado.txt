@@ -1,0 +1,27 @@
+UDP – Difusión de alertas meteorológicas (Multicast)
+Un servicio meteorológico quiere emitir alertas a todos los clientes suscritos a la vez, usando un grupo multicast UDP (en vez de enviar una a una a cada cliente). Se pide:
+1. Clase DatosAlerta (implementa Serializable)
+
+Atributos: tipo (String: "LLUVIA", "VIENTO" o "NIEVE") y nivel (int, de 1 a 3).
+Constructor, getters y toString().
+
+2. Clase ServidorAlertas (clase principal con main)
+
+Crea un DatagramSocket normal (no necesita ser MulticastSocket, eso solo es obligatorio en el lado que recibe del grupo).
+Define la dirección del grupo multicast: 230.0.0.1, puerto 9000.
+En un bucle, genera 5 alertas con tipo y nivel aleatorios (usa Random), esperando 2 segundos entre cada una (Thread.sleep(2000)).
+Por cada alerta: la serializa a bytes (ByteArrayOutputStream + ObjectOutputStream) y la envía al grupo multicast con un DatagramPacket dirigido a la IP y puerto del grupo.
+Al terminar, muestra un mensaje indicando que ha terminado de emitir alertas.
+
+3. Clase ClienteAlertas (clase principal con main)
+
+Crea un MulticastSocket en el puerto 9000.
+Se une al grupo con joinGroup() usando la IP 230.0.0.1.
+Recibe 5 alertas en bucle (receive()), deserializando cada una (ByteArrayInputStream + ObjectInputStream) y mostrándola por consola.
+Al recibir la quinta, abandona el grupo con leaveGroup() y cierra el socket.
+
+Requisitos adicionales:
+
+Hay que lanzar el ClienteAlertas antes de arrancar el ServidorAlertas (o casi a la vez), ya que UDP no guarda mensajes pendientes para quien se conecta tarde.
+Captura las excepciones de E/S correctamente.
+Puedes lanzar dos instancias del cliente a la vez para comprobar que ambas reciben las mismas 5 alertas (esa es la gracia del multicast frente al unicast que hemos hecho en el ejercicio anterior).

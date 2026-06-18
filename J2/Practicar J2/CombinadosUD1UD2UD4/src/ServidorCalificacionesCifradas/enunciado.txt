@@ -1,0 +1,50 @@
+Ejercicio combinado (Temas 1, 2 y 4) – Servidor de calificaciones cifradas
+Un instituto quiere centralizar el registro de notas de examen. Los profesores envían la nota de un alumno por TCP, y el servidor debe cifrar la respuesta antes de devolverla, además de atender a varios profesores a la vez mediante un pool de hilos (en vez de un hilo por cliente "a mano", para variar respecto a los ejercicios anteriores). Se pide:
+1. Clase DatosNota (implementa Serializable)
+
+Atributos: alumno (String) y nota (double).
+Constructor y getters.
+
+2. Clase RespuestaCifrada (implementa Serializable)
+
+Atributos: datosCifrados (byte[]), iv (byte[]) y hashIntegridad (String).
+Constructor y getters.
+
+3. Clase UtilSeguridad
+
+Clave AES fija de 16 bytes compartida (igual que en ejercicios anteriores).
+Método cifrar(String texto) → devuelve los datos cifrados y el IV (con Cipher AES/CBC/PKCS5Padding y SecureRandom para el IV).
+Método calcularSHA256(String texto) → devuelve el hash en hexadecimal.
+
+4. Clase TareaProfesor (implementa Runnable, NO extiende Thread)
+
+Recibe el Socket del cliente por constructor.
+En su run():
+
+Abre ObjectOutputStream antes que ObjectInputStream.
+Lee el DatosNota recibido.
+Construye el texto "<alumno> ha obtenido un <nota>".
+Calcula su SHA-256 (para que el profesor pueda comprobar integridad).
+Cifra ese mismo texto con UtilSeguridad.cifrar().
+Envía un RespuestaCifrada con los datos cifrados, el IV y el hash.
+Cierra el socket.
+
+
+
+5. Clase ServidorNotas (clase principal con main)
+
+Crea un ExecutorService con un pool fijo de 4 hilos (Executors.newFixedThreadPool(4)).
+Escucha en el puerto 7200.
+En bucle infinito, acepta conexiones y envía cada una al pool con execute(new TareaProfesor(socket)).
+
+6. Clase ClienteProfesor (clase principal con main)
+
+Pide por teclado el nombre del alumno y la nota.
+Envía el DatosNota al servidor.
+Recibe la RespuestaCifrada, descifra el mensaje con UtilSeguridad (necesitarás un método de descifrado simétrico al de cifrado) y comprueba que su SHA-256 coincide con hashIntegridad recibido.
+Muestra el mensaje descifrado y si la integridad es correcta o no.
+
+Requisitos adicionales:
+
+El pool de hilos del servidor debe permitir atender hasta 4 profesores en paralelo sin bloquear al resto.
+La verificación de integridad debe hacerse en el cliente, comparando el hash recibido con el hash que él mismo calcula sobre el texto descifrado.

@@ -1,0 +1,53 @@
+Ejercicio combinado (Temas 1, 2 y 4) – Servidor de mensajería segura
+Una empresa quiere montar un servidor de mensajería que reciba mensajes de varios clientes a la vez (Tema 1), los reciba como objetos serializados por TCP (Tema 2), y verifique que el contenido va cifrado y no ha sido manipulado (Tema 4). Se pide:
+1. Clase MensajeCifrado (implementa Serializable)
+
+Atributos: datosCifrados (byte[]), iv (byte[]) y hash (String, el SHA-256 del mensaje en claro, calculado por el cliente antes de cifrar).
+Constructor y getters.
+
+2. Clase UtilCifrado
+
+Constante con una clave AES fija de 16 bytes, compartida entre cliente y servidor (igual que en el ejemplo MainCrypto de los apuntes, un array byte[] de 16 elementos).
+Método estático cifrar(String texto) que:
+
+Genere un IV aleatorio con SecureRandom (16 bytes).
+Cifre el texto con Cipher.getInstance("AES/CBC/PKCS5Padding").
+Devuelva un array de bytes con el resultado (puedes envolver datos cifrados + IV en un pequeño objeto auxiliar, o devolver ambos por separado).
+
+
+Método estático descifrar(byte[] datosCifrados, byte[] iv) que haga lo inverso y devuelva el texto en claro.
+Método estático calcularSHA256(String texto) que devuelva el hash en formato hexadecimal (usando MessageDigest).
+
+3. Clase ManejadorCliente (extiende Thread)
+
+Recibe el Socket del cliente por constructor.
+En su run():
+
+Abre ObjectOutputStream antes que ObjectInputStream.
+Lee el MensajeCifrado recibido.
+Descifra datosCifrados con UtilCifrado.descifrar().
+Calcula el SHA-256 del texto descifrado y lo compara con el hash recibido.
+Si coinciden: muestra por consola "Mensaje verificado: <texto>" y responde al cliente con el String "OK: mensaje recibido correctamente".
+Si no coinciden: muestra "¡Integridad comprometida!" y responde con "ERROR: integridad comprometida".
+Cierra el socket.
+
+
+
+4. Clase Servidor (clase principal con main)
+
+Escucha en el puerto 7000.
+En bucle infinito, acepta conexiones y lanza un ManejadorCliente por cada cliente (atención concurrente, varios clientes a la vez).
+
+5. Clase Cliente (clase principal con main)
+
+Pide por teclado un mensaje.
+Calcula su SHA-256 en claro.
+Cifra el mensaje con UtilCifrado.cifrar().
+Construye el MensajeCifrado (datos cifrados + IV + hash) y lo envía al servidor.
+Recibe y muestra la respuesta del servidor.
+
+Requisitos adicionales:
+
+El cifrado debe hacerse antes de calcular nada en el servidor: la clave AES nunca viaja por la red, solo el texto ya cifrado.
+El servidor debe poder atender a varios clientes simultáneamente sin bloquearse.
+Capturar correctamente excepciones de criptografía, de E/S y de objetos.

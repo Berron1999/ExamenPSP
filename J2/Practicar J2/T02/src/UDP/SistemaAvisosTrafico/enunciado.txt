@@ -1,0 +1,33 @@
+Ejercicio UDP – Sistema de avisos de tráfico
+Un servicio de tráfico quiere recibir avisos de incidencias en carreteras a través de UDP. Los clientes envían un aviso, y el servidor lo registra y confirma la recepción. Si el servidor lleva 1 minuto sin recibir ningún aviso, debe cerrarse automáticamente. Se pide:
+1. Clase DatosAviso (implementa Serializable)
+
+Atributos: carretera (String) y gravedad (int, de 1 a 3).
+Constructor, getters y toString().
+
+2. Clase ServidorAvisos (clase principal con main)
+
+Crea un DatagramSocket en el puerto 8000.
+Configura un timeout de 60000 ms con setSoTimeout().
+En un bucle:
+
+Espera a recibir un DatagramPacket con receive().
+Si pasa el minuto sin recibir nada, se lanza SocketTimeoutException: hay que capturarla, mostrar un mensaje de "Servidor cerrado por inactividad" y salir del bucle (terminando el programa).
+Si recibe un paquete, debe deserializar el objeto DatosAviso contenido en los bytes del paquete (usando ByteArrayInputStream + ObjectInputStream, como se explica en los apuntes para enviar objetos por UDP).
+Muestra por consola el aviso recibido.
+Envía de vuelta al cliente (a la IP y puerto de origen del paquete recibido) un mensaje de confirmación en texto, por ejemplo: "Aviso registrado: carretera <X>, gravedad <Y>".
+
+
+
+3. Clase ClienteAviso (clase principal con main)
+
+Crea un DatagramSocket temporal (sin puerto fijo).
+Pide por teclado la carretera y la gravedad del aviso.
+Serializa el objeto DatosAviso a un array de bytes (ByteArrayOutputStream + ObjectOutputStream).
+Envía el DatagramPacket resultante a localhost:8000.
+Espera la respuesta del servidor con receive() y la muestra por consola.
+
+Requisitos adicionales:
+
+Hay que capturar correctamente SocketTimeoutException (que NO es lo mismo que un error real, sino el aviso de que pasó el tiempo límite) por separado del resto de excepciones de E/S.
+El array de bytes para recibir paquetes debe tener un tamaño razonable, por ejemplo 1024 bytes.

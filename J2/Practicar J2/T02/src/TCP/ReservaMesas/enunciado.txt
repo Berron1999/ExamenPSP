@@ -1,0 +1,52 @@
+Sistema de reserva de mesas
+Un restaurante tiene 5 mesas numeradas del 1 al 5. Quiere montar un pequeño servicio TCP para que los clientes puedan reservar una mesa por su número. Se pide:
+1. Clase DatosReserva (implementa Serializable)
+
+Atributo: numeroMesa (int).
+Constructor y getter.
+
+2. Clase RespuestaReserva (implementa Serializable)
+
+Atributos: mensaje (String) y exito (boolean).
+Constructor y getters.
+
+3. Clase GestorMesas
+
+Mantiene el estado de las 5 mesas (por ejemplo, un array de boolean[] ocupadas, donde false = libre).
+Debe tener un método reservar(int numeroMesa) que:
+
+Compruebe si el número de mesa es válido (entre 1 y 5) y si está libre.
+Si está libre, la marque como ocupada y devuelva true.
+Si no está libre o el número no es válido, devuelva false.
+Este método debe ser seguro frente a varios clientes pidiendo reservar a la vez (puede que dos clientes intenten reservar la misma mesa en el mismo instante).
+
+
+
+4. Clase ManejadorCliente (extiende Thread)
+
+Recibe por constructor el Socket del cliente y una referencia al GestorMesas compartido.
+En su run():
+
+Abre primero el ObjectOutputStream y después el ObjectInputStream.
+Lee el objeto DatosReserva enviado por el cliente.
+Llama a GestorMesas.reservar() y construye una RespuestaReserva con el resultado (mensaje tipo "Mesa 3 reservada con éxito" o "Mesa 3 no disponible").
+Envía la respuesta al cliente y cierra el socket.
+
+
+
+5. Clase Servidor (clase principal con main)
+
+Crea una única instancia de GestorMesas compartida por todos los clientes.
+Escucha en el puerto 6500.
+Acepta conexiones en bucle infinito y lanza un ManejadorCliente por cada una.
+
+6. Clase Cliente (clase principal con main)
+
+Se conecta a localhost:6500.
+Pide por teclado el número de mesa a reservar.
+Envía el DatosReserva y muestra por consola la RespuestaReserva recibida.
+
+Requisitos adicionales:
+
+El acceso al estado de las mesas (GestorMesas) debe estar protegido frente a condiciones de carrera, ya que varios ManejadorCliente pueden llamar a reservar() simultáneamente.
+Capturar correctamente las excepciones de E/S y de objetos no encontrados (IOException, ClassNotFoundException).

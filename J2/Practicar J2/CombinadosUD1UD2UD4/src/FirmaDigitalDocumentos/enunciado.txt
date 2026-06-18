@@ -1,0 +1,49 @@
+Ejercicio combinado (Temas 1, 2 y 4) – Firma digital de documentos
+Una notaría digital quiere verificar la autenticidad de los documentos que le llegan de varios clientes a la vez. Cada cliente firma su documento con su propia clave privada RSA, y el servidor verifica esa firma con la clave pública correspondiente. Se pide:
+1. Clase DatosDocumento (implementa Serializable)
+
+Atributos: contenido (String), firma (byte[]) y clavePublica (byte[], la clave pública del cliente codificada, para que el servidor pueda reconstruirla).
+Constructor y getters.
+
+2. Clase RespuestaVerificacion (implementa Serializable)
+
+Atributos: valido (boolean) y mensaje (String).
+Constructor y getters.
+
+3. Clase UtilFirma
+
+Método generarClaves() que devuelva un KeyPair RSA de 2048 bits (KeyPairGenerator).
+Método firmar(String texto, PrivateKey clavePrivada) que use Signature.getInstance("SHA256withRSA") y devuelva la firma en bytes.
+Método verificar(String texto, byte[] firma, PublicKey clavePublica) que devuelva true/false según si la firma es válida.
+
+4. Clase ManejadorDocumento (extiende Thread)
+
+Recibe el Socket del cliente por constructor.
+En su run():
+
+Abre ObjectOutputStream antes que ObjectInputStream.
+Lee el DatosDocumento.
+Reconstruye la PublicKey del cliente a partir de los bytes recibidos (usando KeyFactory y X509EncodedKeySpec).
+Verifica la firma con UtilFirma.verificar().
+Construye una RespuestaVerificacion con el resultado ("Documento auténtico" o "Firma inválida, documento rechazado").
+Envía la respuesta y cierra el socket.
+
+
+
+5. Clase ServidorNotaria (clase principal con main)
+
+Escucha en el puerto 7600.
+En bucle infinito, acepta conexiones y lanza un ManejadorDocumento por cada cliente (varios a la vez, sin límite).
+
+6. Clase ClienteNotaria (clase principal con main)
+
+Genera su propio par de claves RSA con UtilFirma.generarClaves() (simulando que cada cliente ya tiene su identidad digital).
+Pide por teclado el contenido del documento.
+Firma el contenido con su clave privada.
+Envía el DatosDocumento (contenido, firma, y los bytes de su clave pública con getEncoded()).
+Muestra la respuesta del servidor.
+
+Requisitos adicionales:
+
+La clave privada nunca se transmite, solo la pública (es la base de la criptografía asimétrica que viste en los apuntes).
+Prueba también a modificar el contenido después de firmarlo pero antes de enviarlo, para comprobar que el servidor lo detecta y lo rechaza.

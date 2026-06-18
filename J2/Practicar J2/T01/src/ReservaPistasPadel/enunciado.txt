@@ -1,0 +1,31 @@
+Reserva de pistas de pádel
+Un club deportivo tiene 2 pistas de pádel disponibles. A lo largo de la tarde llegan grupos de jugadores que quieren reservar una pista para jugar un partido. Se pide:
+1. Clase Partido (implementa Runnable, ejecutado mediante ExecutorService)
+
+Cada partido tiene un identificador (int id) y una duración de juego en milisegundos (int duracion), recibidos por constructor.
+En su run():
+
+Debe mostrar un mensaje indicando que el partido id empieza a jugarse.
+Simular la duración del partido con Thread.sleep(duracion).
+Mostrar un mensaje de que el partido ha terminado.
+Registrar el partido como finalizado en una clase RegistroPistas compartida (incrementando un contador y guardando el id del último partido jugado).
+
+
+
+2. Clase RegistroPistas
+
+Debe llevar un contador de partidos jugados y guardar el id del último partido finalizado.
+El acceso a estos datos debe estar protegido con synchronized, ya que varios partidos pueden terminar casi a la vez y van a modificar estos datos de forma concurrente.
+Debe tener un método para mostrar un resumen (total de partidos jugados + último id registrado).
+
+3. Clase ClubPadel (clase principal con main)
+
+Debe crear un ExecutorService con un pool fijo de 2 hilos (representando las 2 pistas disponibles), usando Executors.newFixedThreadPool(2).
+Debe lanzar 8 partidos con duraciones aleatorias entre 500 y 2000 ms (usa Random), enviándolos al ExecutorService con execute().
+Una vez enviados todos los partidos, debe cerrar el pool con shutdown() y esperar a que todos terminen con awaitTermination().
+Al finalizar, debe mostrar el resumen final desde RegistroPistas.
+
+Requisitos adicionales:
+
+Solo deben poder jugarse 2 partidos a la vez como máximo (esto lo controla directamente el tamaño del pool, no hace falta semáforo aquí).
+El acceso a RegistroPistas debe ser seguro frente a condiciones de carrera.

@@ -1,0 +1,37 @@
+Sistema de validación de productos
+Una empresa quiere montar un pequeño servicio TCP para validar los productos que se introducen en el sistema. El cliente envía los datos de un producto, y el servidor calcula un hash de verificación y comprueba si el producto es válido. Se pide:
+1. Clase DatosProducto (implementa Serializable)
+
+Atributos: codigo (String) y precio (double).
+Constructor, getters y toString().
+
+2. Clase RespuestaValidacion (implementa Serializable)
+
+Atributos: hash (String, el SHA-256 calculado) y valido (boolean).
+Constructor, getters y toString().
+
+3. Clase ManejadorCliente (extiende Thread)
+
+Recibe el Socket del cliente por constructor.
+En su run():
+
+Abre primero el ObjectOutputStream y después el ObjectInputStream (en ese orden, para evitar deadlock).
+Lee el objeto DatosProducto enviado por el cliente.
+Calcula el SHA-256 de la cadena codigo + precio usando MessageDigest.
+Determina si el producto es válido (por ejemplo: precio > 0 y codigo no vacío).
+Construye un RespuestaValidacion con el hash y el resultado, y lo envía de vuelta al cliente.
+Cierra el socket al terminar.
+
+
+
+4. Clase Servidor (clase principal con main)
+
+Escucha en el puerto 6000.
+En bucle infinito, acepta conexiones y lanza un ManejadorCliente por cada una (multi-cliente).
+
+5. Clase Cliente (clase principal con main)
+
+Se conecta a localhost:6000.
+Pide por teclado (Scanner) el código y el precio del producto.
+Abre primero el ObjectOutputStream y después el ObjectInputStream.
+Envía el DatosProducto y muestra por consola la RespuestaValidacion recibida.

@@ -1,0 +1,52 @@
+Ejercicio combinado (Temas 1, 2 y 4) – Votación electrónica sincronizada
+Una pequeña asamblea quiere votar electrónicamente entre 3 opciones (A, B, C). Las normas dicen que nadie conoce el resultado hasta que los 3 miembros hayan votado — el servidor debe esperar a que lleguen exactamente 3 votos antes de revelar el resultado a cualquiera, usando una barrera de sincronización (no un semáforo, para variar). Además, cada voto va cifrado con una clave derivada de una contraseña mediante PBKDF2. Se pide:
+1. Clase DatosVoto (implementa Serializable)
+
+Atributos: opcionCifrada (byte[]) y iv (byte[]).
+Constructor y getters.
+
+2. Clase RespuestaVotacion (implementa Serializable)
+
+Atributo: resumen (String, con el resultado final, ej: "A: 2, B: 1, C: 0").
+Constructor y getter.
+
+3. Clase UtilVoto
+
+Una contraseña y un salt fijos (compartidos, igual estilo que la clave AES fija de ejercicios anteriores), usados para derivar una clave AES con PBEKeySpec + SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256") (65536 iteraciones, 256 bits).
+Método cifrar(String opcion) → cifra con AES/CBC/PKCS5Padding usando la clave derivada y un IV aleatorio (SecureRandom).
+Método descifrar(byte[] datos, byte[] iv) → operación inversa.
+
+4. Clase ContadorVotos
+
+Mantiene 3 contadores (uno por opción A, B y C).
+Método incrementar(String opcion), seguro frente a concurrencia (varios hilos pueden votar casi a la vez).
+Método obtenerResumen() que devuelva elString con el resultado final.
+
+5. Clase ManejadorVoto (extiende Thread)
+
+Recibe por constructor el Socket, una CyclicBarrier compartida (con 3 partes) y el ContadorVotos compartido.
+En su run():
+
+Abre ObjectOutputStream antes que ObjectInputStream.
+Lee el DatosVoto, lo descifra con UtilVoto, e incrementa el contador correspondiente.
+Llama a barrera.await() — se queda bloqueado aquí hasta que los otros 2 hilos también lleguen a este punto.
+Una vez liberados los 3 a la vez, construye la RespuestaVotacion con el resumen final y la envía a su cliente.
+Cierra el socket.
+
+
+
+6. Clase ServidorVotacion (clase principal con main)
+
+Escucha en el puerto 7800.
+En un bucle por rondas de 3 votantes: crea una CyclicBarrier(3) nueva y un ContadorVotos nuevo por ronda, acepta 3 conexiones, lanza un ManejadorVoto por cada una, y vuelve a repetir el proceso indefinidamente para la siguiente ronda de 3 votantes.
+
+7. Clase ClienteVotante (clase principal con main)
+
+Pide por teclado la opción a votar (A, B o C).
+La cifra con UtilVoto y envía el DatosVoto.
+Muestra el resumen recibido (el cliente se queda esperando hasta que los otros 2 también voten).
+
+Requisitos adicionales:
+
+Necesitas lanzar 3 instancias de ClienteVotante para que se complete una ronda — con menos de 3, todos se quedan esperando indefinidamente en el await().
+El acceso a ContadorVotos debe estar protegido frente a condiciones de carrera.

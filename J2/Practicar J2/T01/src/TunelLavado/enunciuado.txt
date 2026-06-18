@@ -1,0 +1,38 @@
+Ejercicio Tema 1 – Simulación de un túnel de lavado
+Una empresa de lavado de coches "AutoLimpio" dispone de un túnel de lavado con 3 bahías de lavado disponibles. Cada coche que llega debe esperar a que haya una bahía libre antes de poder lavarse. Se pide implementar una simulación con las siguientes clases:
+1. Clase Coche (extiende Thread)
+
+Cada coche tiene un identificador (int id) y un tipo de lavado (String tipo: "básico", "completo" o "premium"), que recibirá por constructor.
+En su método run():
+
+Debe pedir acceso a una bahía de lavado (usando un semáforo compartido).
+Al conseguir la bahía, debe mostrar por consola un mensaje indicando que el coche id ha entrado a lavarse con su tipo de lavado.
+Debe simular el tiempo de lavado con Thread.sleep(), siendo:
+
+básico → 1000 ms
+completo → 2000 ms
+premium → 3000 ms
+
+
+Al terminar, debe mostrar un mensaje de que el coche ha salido y liberar la bahía.
+Debe incrementar un contador global (compartido entre todos los hilos) de coches lavados.
+
+
+
+2. Clase ContadorLavados
+
+Debe contener un contador estático (o de instancia, a elección) que se incremente de forma segura ante el acceso concurrente de varios hilos (pensar si hace falta synchronized o si el Semaphore ya es suficiente para evitar problemas).
+Debe tener un método para consultar el valor actual del contador.
+
+3. Clase TunelLavado (clase principal con main)
+
+Debe declarar el semáforo con permisos para 3 bahías simultáneas.
+Debe lanzar 10 coches con tipos de lavado aleatorios (puedes usar Random para elegir entre "básico", "completo" y "premium").
+Una vez lanzados todos los hilos, el hilo principal debe esperar a que todos los coches hayan terminado de lavarse (usando join() o el mecanismo que se considere adecuado) antes de continuar.
+Al finalizar, debe mostrar por consola el número total de coches lavados, leído desde ContadorLavados.
+
+Requisitos adicionales:
+
+No se debe permitir que entren más de 3 coches a la vez en el túnel (sección crítica controlada por el semáforo).
+El acceso al contador global debe ser seguro frente a condiciones de carrera.
+Se debe poder identificar en la consola qué coche entra, con qué tipo de lavado, y cuándo sale.
